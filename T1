@@ -1,0 +1,80 @@
+// Este código fué creado por Alberto Monnier Romero, IECA 11
+// El código crea un ciclo de encendido y apagado de los tres colores del
+// led RGB de una tarjeta FRDM-K64F.
+
+// Se llaman las librerías
+#include <stdio.h>
+#include <stdint.h>
+#include "MK64F12.h"
+
+// Se declara una función de retardo
+void delay(uint32_t delay);
+
+// Declaraciones globales
+int main(void) {
+
+	// Se activan los relojes de los puertos B y E
+	SIM->SCGC5 = 0X400;
+	SIM->SCGC5 |= 0X2000;
+
+	// Se habilitan los puertos del led
+	PORTB->PCR[22] = 0x00000100;
+	PORTB->PCR[21] = 0x00000100;
+	PORTE->PCR[26] = 0x00000100;
+
+	// Se configuran los valores iniciales para los puertos B y E, (Nótese que el puerto B
+	// posee valores de salida para los pines 26 y 22 en código hexadecimal)
+	GPIOB->PDOR = 0x00600000;
+	GPIOE->PDOR = 0x04000000;
+
+	// Se configuran los puertos B y E como puertos de salida
+	GPIOB->PDDR = 0x00600000;
+	GPIOE->PDDR = 0x04000000;
+
+    while(1) {
+    	// Nótese que al haber configurado el valor 600000 por defecto en el puerto B,
+    	// el valor 200000 asociado al azul, enciende el color rojo y apaga el azul
+    	// por la configuración normalmente cerrada de los pines del RGB.
+    	GPIOB->PDOR = 0x00200000;
+
+    	// Se configura la función de retardo igualándola a la frecuencia en Hertz del reloj
+    	// para que dure 1 segundo
+ 		delay(1440000);
+
+ 		// Se usa el valor 600000 para apagar el led completamente y no solo uno de los dos
+ 		// valores configurados
+		GPIOB->PDOR = 0x00600000;
+
+		delay(1440000);
+
+		GPIOB->PDOR = 0x00400000;
+
+		delay(1440000);
+
+		GPIOB->PDOR = 0x00600000;
+
+		delay(1440000);
+
+		// Se activa el puerto E asociado al led verde
+		GPIOE->PDOR = 0;
+
+		delay(1440000);
+
+		GPIOE->PDOR = 0x04000000;
+
+		delay(1440000);
+
+    }
+    return 0 ;
+}
+
+	// Se define la función de retardo a través de un ciclo que termina de ejecutarse
+	// al alcanzar el valor de i y que es dependiente de la frecuencia del reloj de la tarjeta
+void delay(uint32_t delay)
+{
+	volatile uint32_t i;
+
+	for (i = 0; i < delay; ++i) {
+
+	}
+}
